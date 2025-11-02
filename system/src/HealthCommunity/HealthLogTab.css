@@ -1,0 +1,304 @@
+/* HealthCommunity/HealthLogTab.css */
+
+/* === Timeline/Grid Layout === */
+.timeline-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  position: relative;
+  margin-top: 1.5rem;
+}
+
+/* Base style for card */
+.card {
+  background-color: white;
+  border: 1px solid #fef3c7;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  transition: all 0.2s ease-in-out;
+}
+.card:hover {
+  transform: translateY(-2px); /* Subtle lift on hover */
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07);
+}
+
+.log-photo {
+  max-height: 250px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb; /* Light gray border */
+}
+
+.log-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === Main Header Buttons/Dropdown === */
+.month-dropdown {
+  font-weight: 600;
+  background-color: #fff7ed;
+  border: 2px solid #fbbf24;
+  color: #92400e;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.month-dropdown:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.18);
+}
+.add-log-btn {
+  font-weight: 600;
+  background-color: #f97316;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3); /* Stronger shadow for main action */
+  transition: background-color 0.15s ease-in-out;
+}
+.add-log-btn:hover { background-color: #ea580c; }
+.add-log-btn:active { background-color: #c2410c; transform: translateY(1px); }
+
+/* log action buttons (edit/delete) */
+.log-action-btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.edit-btn {
+  color: #475569; /* Slate 600 */
+  background-color: #f1f5f9; /* Slate 100 */
+}
+.edit-btn:hover { background-color: #e2e8f0; } /* Slate 200 */
+.delete-btn {
+  color: #dc2626; /* Red 600 */
+  background-color: #fee2e2; /* Red 100 */
+}
+.delete-btn:hover { background-color: #fecaca; } /* Red 200 */
+
+/* === Modal Styling === */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem; /* Padding for mobile */
+}
+
+.modal-content {
+  background-color: white;
+  width: 100%;
+  max-width: 32rem; /* Increased size for form content */
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Increased max height */
+  overflow: hidden;
+}
+
+/* HEADER: Need space for the top-right button */
+.modal-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  padding-top: 0.5rem; 
+}
+
+/* CANCEL BUTTON: Top-right Close Icon */
+.cancel-btn-top {
+  position: absolute;
+  right: -0.5rem; /* Slightly off the edge for better click target */
+  top: -0.5rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f5f9; 
+  color: #475569; 
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, transform 0.1s;
+}
+.cancel-btn-top:hover {
+  background-color: #e2e8f0; 
+  transform: rotate(90deg);
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.modal-body {
+  overflow-y: auto; 
+  padding-right: 0.5rem; 
+  padding-bottom: 1rem;
+}
+.modal-body::-webkit-scrollbar { width: 6px; }
+.modal-body::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+
+/* inputs */
+.form-input {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+.form-input:focus {
+  border-color: #f97316; 
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2); 
+  outline: none;
+}
+
+.file-drop-area {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background-color: #f8fafc;
+  cursor: pointer;
+  border: 2px dashed #d1d5db; 
+  transition: all 0.2s;
+}
+.file-drop-area:hover {
+    background-color: #f0f4f8;
+    border-color: #f97316;
+}
+
+/* --- FIX: Modal Footer with Action Buttons --- */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f1f5f9; 
+  margin-top: 1rem; 
+  flex-shrink: 0; 
+}
+
+/* Primary Save Button */
+.save-btn {
+  background-color: #f97316; /* Primary Orange */
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.3); /* Clear shadow */
+}
+.save-btn:hover { background-color: #ea580c; }
+.save-btn:active { transform: scale(0.98); }
+
+/* Secondary Cancel Button in Footer */
+.cancel-btn-footer {
+    background-color: transparent;
+    color: #475569; /* Slate 600 */
+    padding: 0.75rem 1.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: background-color 0.15s ease-in-out;
+    cursor: pointer;
+}
+.cancel-btn-footer:hover {
+    background-color: #f1f5f9;
+}
+
+
+/* === Delete Confirmation Dialog === */
+.confirm-dialog {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 24rem;
+  text-align: center;
+}
+.confirm-dialog h3 { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
+.confirm-dialog p { color: #64748b; margin-bottom: 1.5rem; }
+.confirm-actions { display:flex; gap:1rem; justify-content: center; }
+.confirm-actions button { flex-grow:1; padding:0.75rem; border-radius:0.5rem; font-weight:600; border:none; cursor:pointer; transition:background-color 0.2s; }
+.confirm-delete-btn { background-color: #ef4444; color:white; }
+.confirm-delete-btn:hover { background-color:#dc2626; }
+.confirm-cancel-btn { background-color:#f1f5f9; color:#334155; }
+.confirm-cancel-btn:hover { background-color:#e2e8f0; }
+
+/* Timeline Marker (Subtle vertical line) */
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+}
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 11px;
+  bottom: 0;
+  width: 2px;
+  background-color: rgba(249, 115, 22, 0.18);
+  z-index: 0;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 10px;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background-color: #fffbeb;
+  border: 3px solid #f97316;
+  z-index: 1;
+}
+
+@media (max-width: 640px) {
+    .modal-content {
+        max-width: 100%;
+        margin: 0.5rem;
+    }
+    .modal-header {
+        margin-bottom: 1rem;
+    }
+    .modal-title {
+        font-size: 1.25rem;
+    }
+}

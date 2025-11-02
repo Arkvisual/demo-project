@@ -1,0 +1,151 @@
+/* ScanProduct.css */
+
+#app-container {
+  max-width: 800px;      /* Increased width */
+  margin: 2rem auto;
+  padding: 3rem;         /* More padding */
+  font-family: 'Inter', sans-serif;
+  background-color: #e0f7fa; /* Light cyan background */
+  border-radius: 2rem;    /* Slightly more rounded */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  min-height: 95vh;      /* Taller box */
+}
+
+.ocr-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.back-btn,
+.about-btn {
+  padding: 0.6rem 1.2rem; /* Larger buttons */
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: white;
+}
+
+.back-btn {
+  background-color: #6366f1;
+}
+
+.back-btn:hover {
+  background-color: #4f46e5;
+}
+
+.about-btn {
+  background-color: #10b981;
+}
+
+.about-btn:hover {
+  background-color: #059669;
+}
+
+#main-title {
+  font-size: 2rem;   /* Slightly bigger title */
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+  flex: 1;
+}
+
+#main-subtitle {
+  text-align: center;
+  color: #4b5563;
+  margin-bottom: 2rem;  /* More space below subtitle */
+}
+
+.about-box {
+  background-color: #f0fdf4;
+  border: 1px solid #34d399;
+  padding: 1.5rem;  /* Taller box */
+  border-radius: 1rem;
+  color: #065f46;
+  margin-bottom: 1.5rem;
+}
+
+.upload-area {
+  border: 3px dashed #26a69a;
+  border-radius: 2rem;   /* Slightly more rounded */
+  padding: 3rem;         /* Bigger upload area */
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  background-color: rgba(38, 166, 154, 0.1);
+}
+
+.upload-area:hover {
+  background-color: #e0f2f1;
+  border-color: #00897b;
+}
+
+.upload-icon {
+  width: 4rem;  /* Bigger icon */
+  height: 4rem;
+  color: #26a69a;
+  margin-bottom: 0.5rem;
+}
+
+#upload-text {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  font-size: 1.1rem; /* Slightly bigger text */
+}
+
+#upload-subtext {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.preview-container {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+#image-preview {
+  width: 100%;
+  max-height: 350px;  /* Increased height */
+  object-fit: contain;
+  border-radius: 1rem;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#verify-button {
+  width: 100%;
+  padding: 1rem;       /* Bigger button */
+  font-weight: 700;
+  color: white;
+  background-color: #6366f1;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 1.1rem;   /* Slightly bigger font */
+}
+
+#verify-button:hover:not(:disabled) {
+  background-color: #4f46e5;
+}
+
+#verify-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.message-box {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #16a34a;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+}

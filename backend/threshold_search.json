@@ -1,0 +1,14 @@
+{
+  "avgOriginalDist": 53,
+  "avgFakeDist": 51,
+  "threshold": 52,
+  "originalDistances": [
+    53
+  ],
+  "fakeDistances": [
+    52,
+    52,
+    50,
+    50
+  ]
+}

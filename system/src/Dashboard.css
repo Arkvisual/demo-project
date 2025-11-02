@@ -1,0 +1,343 @@
+/* Dashboard.css - Stylish, Polished Light Theme */
+
+/* ==================== 1. BASE & TYPOGRAPHY ==================== */
+
+:root {
+    /* Color Palette (Refined & Stylish) */
+    --violet-main: #7c3aed; /* Violet-600 (Main Accent & Logout) */
+    --indigo-secondary: #4f46e5; /* Indigo-600 */
+    --teal-accent: #14b8a6; /* Teal-500 */
+    --orange-accent: #f97316; /* Orange-600 */
+    
+    --bg-light: #f4f6fa; /* Ultra-light blue/gray background */
+    --surface-white: #ffffff; /* Pure White Card/Nav Background */
+    --text-dark: #1e293b; /* Dark Slate for Main Text (High Contrast) */
+    --text-muted: #64748b; /* Gray Slate for descriptions */
+    --border-soft: #e2e8f0; /* Soft border color */
+}
+
+/* Apply sophisticated background and clean font */
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+/* Main Container & Loading States */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.loading-text { 
+    font-size: 1.5rem; 
+    color: var(--violet-main); 
+    animation: pulse 1.5s infinite; 
+    text-align: center; 
+    margin-top: 10rem;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ==================== 2. TOP NAVIGATION BAR ==================== */
+
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 3rem;
+    background-color: var(--surface-white);
+    border-bottom: 1px solid var(--border-soft);
+    /* Deeper, softer shadow */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.brand-logo {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--indigo-secondary); /* Stronger logo color */
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.user-greeting {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Icon-Only Button Style (Settings) */
+.nav-button {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-soft);
+    cursor: pointer;
+    padding: 0.7rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.nav-button:hover {
+    background-color: var(--violet-main);
+    border-color: var(--violet-main);
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
+}
+
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--text-dark);
+    transition: color 0.2s;
+}
+.nav-button:hover .nav-icon {
+    color: var(--surface-white);
+}
+
+
+/* LOGOUT BOX BUTTON (Violet Style) */
+.logout-box-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background-color: var(--violet-main); 
+    color: var(--surface-white); 
+    border: none;
+    border-radius: 0.6rem; 
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.25s;
+    /* Elevated shadow effect */
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.4); 
+}
+
+.logout-box-button:hover {
+    background-color: var(--indigo-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.5);
+}
+
+.logout-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--surface-white);
+}
+
+/* ==================== 3. MAIN CONTENT AREA ==================== */
+
+.main-content-area {
+    flex-grow: 1;
+    padding: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.main-header {
+    margin-bottom: 3.5rem;
+    text-align: left;
+    /* Optional: Subtle line underneath header */
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 1rem;
+}
+
+.greeting-title {
+    font-size: 2.6rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.greeting-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+/* ==================== 4. FEATURES GRID & CARDS ==================== */
+
+.features-section {
+    margin-bottom: 4rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* Feature Card Base (Stylish Lifted Effect) */
+.feature-card {
+    background: var(--surface-white);
+    border: 1px solid var(--border-soft);
+    border-radius: 1.25rem; /* More rounded */
+    padding: 2rem;
+    /* Soft, multi-layered shadow for depth */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 2px 5px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    color: var(--text-dark);
+    cursor: pointer;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    text-align: left;
+}
+
+/* Hover Effect: Deeper lift and vibrant border */
+.feature-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+    border-color: var(--primary-accent); /* Border changes on hover */
+}
+.feature-1:hover { border-color: var(--violet-main); }
+.feature-2:hover { border-color: var(--teal-accent); }
+.feature-3:hover { border-color: var(--orange-accent); }
+
+
+/* ICON BADGE STYLES - More prominent and colorful */
+.icon-badge {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    background-color: var(--bg-light); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+/* Icon Color Mapping */
+.feature-1 .icon-badge { background-color: #ede9fe; } /* Very light violet */
+.feature-2 .icon-badge { background-color: #ccfbf1; } /* Very light teal */
+.feature-3 .icon-badge { background-color: #ffedd5; } /* Very light orange */
+
+.feature-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--violet-main); 
+}
+.feature-2 .feature-icon { color: var(--teal-accent); }
+.feature-3 .feature-icon { color: var(--orange-accent); }
+/* Icon turns white on card hover */
+.feature-card:hover .icon-badge { background-color: var(--primary-accent); }
+.feature-1:hover .icon-badge { background-color: var(--violet-main); }
+.feature-2:hover .icon-badge { background-color: var(--teal-accent); }
+.feature-3:hover .icon-badge { background-color: var(--orange-accent); }
+.feature-card:hover .feature-icon { color: var(--surface-white); }
+
+
+.card-title {
+    font-size: 1.5rem; 
+    font-weight: 800; 
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+/* Bulleted List Style - Tighter and cleaner */
+.info-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    flex-grow: 1;
+}
+
+.info-list li {
+    position: relative;
+    padding-left: 1.25em;
+    margin-bottom: 0.4em;
+}
+
+.info-list li::before {
+    content: '→'; /* Modern arrow bullet */
+    font-weight: 800;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+/* Bullet color mapping */
+.feature-1 .info-list li::before { color: var(--violet-main); }
+.feature-2 .info-list li::before { color: var(--teal-accent); }
+.feature-3 .info-list li::before { color: var(--orange-accent); }
+
+
+/* Action Link Style - Underline effect on hover */
+.card-action {
+    margin-top: auto;
+    font-weight: 700;
+    color: var(--violet-main);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 1rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.feature-2 .card-action { color: var(--teal-accent); }
+.feature-3 .card-action { color: var(--orange-accent); }
+
+.feature-card:hover .card-action {
+    border-color: currentColor; 
+}
+
+.action-arrow {
+    margin-left: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.2s;
+}
+
+.feature-card:hover .action-arrow {
+    transform: translateX(6px); 
+}
+
+/* ==================== 5. FOOTER & MEDIA QUERIES ==================== */
+
+.main-area-footer {
+    margin-top: 5rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-soft);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .top-nav {
+        padding: 1rem 1.5rem;
+    }
+    .user-greeting {
+        display: none; 
+    }
+    .main-content-area {
+        padding: 2rem 1.5rem;
+    }
+    .greeting-title {
+        font-size: 2rem;
+    }
+    .greeting-subtitle {
+        font-size: 1rem;
+    }
+    .features-grid {
+        gap: 1.5rem;
+    }
+    .feature-card {
+        padding: 1.5rem;
+    }
+}
