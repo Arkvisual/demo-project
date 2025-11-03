@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./ScanProduct.css";
 
 function ScanProduct() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -32,9 +33,11 @@ function ScanProduct() {
         throw new Error("Failed to fetch from backend");
       }
 
-      const data = await response.json();
+      const data = await response.json(); // data is { confidence: 100, match: 'Genuine' }
 
-      // ✅ Navigate to results page with backend response
+      // 🛑 ORIGINAL MISTAKE: navigate("/scan-results", { state: { data } });
+
+      // ✅ FIX: Pass the 'data' object directly as the navigation state
       navigate("/scan-results", { state: data });
     } catch (error) {
       console.error("Error uploading or analyzing file:", error);

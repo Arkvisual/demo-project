@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-
+import "./ScanResults.css";
 export default function ScanResults() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,7 +32,8 @@ export default function ScanResults() {
     <div style={{ textAlign: "center", marginTop: "80px" }}>
       <h2>Scan Result</h2>
       <p><strong>Match:</strong> {result.match}</p>
-      <p><strong>Confidence:</strong> {(result.confidence * 100).toFixed(2)}%</p>
+      {/* ✅ FIX: Remove the redundant * 100 */}
+      <p><strong>Confidence:</strong> {(result.confidence).toFixed(2)}%</p> 
 
       <button
         onClick={() => navigate("/scan-product")}
