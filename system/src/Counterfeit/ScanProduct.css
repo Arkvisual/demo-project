@@ -1,14 +1,17 @@
-/* ScanProduct.css */
+/* ScanProduct.css 
+   Note: The current React component (ProductScanner.jsx) uses Tailwind CSS classes for styling, 
+   so this external file is not currently linked or required for its appearance. 
+*/
 
 #app-container {
-  max-width: 800px;      /* Increased width */
+  max-width: 800px;        /* Increased width */
   margin: 2rem auto;
-  padding: 3rem;         /* More padding */
+  padding: 3rem;           /* More padding */
   font-family: 'Inter', sans-serif;
   background-color: #e0f7fa; /* Light cyan background */
-  border-radius: 2rem;    /* Slightly more rounded */
+  border-radius: 2rem;     /* Slightly more rounded */
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-  min-height: 95vh;      /* Taller box */
+  min-height: 95vh;        /* Taller box */
 }
 
 .ocr-header {
@@ -61,7 +64,7 @@
 .about-box {
   background-color: #f0fdf4;
   border: 1px solid #34d399;
-  padding: 1.5rem;  /* Taller box */
+  padding: 1.5rem;       /* Taller box */
   border-radius: 1rem;
   color: #065f46;
   margin-bottom: 1.5rem;
@@ -118,7 +121,7 @@
 
 #verify-button {
   width: 100%;
-  padding: 1rem;       /* Bigger button */
+  padding: 1rem;         /* Bigger button */
   font-weight: 700;
   color: white;
   background-color: #6366f1;
@@ -126,7 +129,7 @@
   border-radius: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  font-size: 1.1rem;   /* Slightly bigger font */
+  font-size: 1.1rem;     /* Slightly bigger font */
 }
 
 #verify-button:hover:not(:disabled) {

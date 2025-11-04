@@ -48,6 +48,9 @@ const CommunityReviewsTab = () => {
     const [rating, setRating] = useState(5);
     const [photoFile, setPhotoFile] = useState(null);
     const fileInputRef = useRef(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [validationErrors, setValidationErrors] = useState({});
+    const [formError, setFormError] = useState('');
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [postToDelete, setPostToDelete] = useState(null);
@@ -100,16 +103,33 @@ const CommunityReviewsTab = () => {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file && file.size < 10 * 1024 * 1024) setPhotoFile(file);
-        else if (file) alert("File is too large. Max size is 10MB.");
+        else if (file) setFormError("File is too large. Max size is 10MB.");
     };
 
     // Submit Review
     const handleSubmitReview = async (e) => {
         e.preventDefault();
+    if (isSaving) return; // prevent duplicate submits
+    setFormError('');
+
+        // Client-side trimming & validation
+        const trimmedTitle = (title || '').trim();
+        const trimmedContent = (content || '').trim();
+        const newValidationErrors = {};
+        if (!trimmedTitle) newValidationErrors.title = 'Please enter a product name or title.';
+        if (!trimmedContent) newValidationErrors.content = 'Please enter your review details.';
+        if (!category) newValidationErrors.category = 'Please select a category.';
+        if (!rating || rating < 1 || rating > 5) newValidationErrors.rating = 'Please select a rating between 1 and 5.';
+
+        setValidationErrors(newValidationErrors);
+        if (Object.keys(newValidationErrors).length > 0) return;
+
+        setIsSaving(true);
 
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            alert("You must be logged in to post a review.");
+            setFormError("You must be logged in to post a review.");
+            setIsSaving(false);
             return;
         }
 
@@ -117,9 +137,10 @@ const CommunityReviewsTab = () => {
             await supabase
                 .from('profiles')
                 .upsert({ id: user.id, full_name: user.email || 'Community User' }, { onConflict: 'id' });
-        } catch (e) {
-            console.error("Profile check failed:", e);
-            alert("A system error occurred during profile setup.");
+        } catch (err) {
+            console.error("Profile check failed:", err);
+            setFormError("A system error occurred during profile setup.");
+            setIsSaving(false);
             return;
         }
 
@@ -131,34 +152,63 @@ const CommunityReviewsTab = () => {
                 .upload(fileName, photoFile);
 
             if (uploadError) {
-                alert("Error uploading photo: " + uploadError.message);
+                setFormError("Error uploading photo: " + (uploadError.message || 'Upload failed'));
+                setIsSaving(false);
                 return;
             }
             const { data: urlData } = supabase.storage.from('review-photos').getPublicUrl(uploadData.path);
             photoUrl = urlData.publicUrl;
         }
 
-        const reviewData = { user_id: user.id, title, content, category, rating, photo_url: photoUrl, is_private: false };
+        const reviewData = { user_id: user.id, title: trimmedTitle, content: trimmedContent, category, rating, photo_url: photoUrl, is_private: false };
 
-        if (editingPost) {
-            const { data, error } = await supabase
-                .from('posts')
-                .update(reviewData)
-                .eq('id', editingPost.id)
-                .select(`*, profiles (full_name)`)
-                .single();
-            if (error) alert("Error updating review: " + error.message);
-            else setPosts(posts.map(post => post.id === data.id ? data : post));
-        } else {
-            const { data: newPost, error } = await supabase
-                .from('posts')
-                .insert(reviewData)
-                .select(`*, profiles (full_name)`)
-                .single();
-            if (error) alert("Error saving review: " + error.message);
-            else setPosts([newPost, ...posts]);
+        try {
+            if (editingPost) {
+                const { data, error } = await supabase
+                    .from('posts')
+                    .update(reviewData)
+                    .eq('id', editingPost.id)
+                    .select(`*, profiles (full_name)`)
+                    .single();
+                if (error) throw error;
+                setPosts(posts.map(post => post.id === data.id ? data : post));
+
+                // If we replaced an existing photo, remove the old file from storage
+                try {
+                    const oldUrl = editingPost.photo_url;
+                    if (oldUrl && photoUrl && oldUrl !== photoUrl) {
+                        const cleaned = oldUrl.split('?')[0];
+                        const marker = '/storage/v1/object/public/';
+                        const idx = cleaned.indexOf(marker);
+                        if (idx !== -1) {
+                            const after = cleaned.substring(idx + marker.length);
+                            const parts = after.split('/');
+                            const bucket = parts.shift();
+                            const path = parts.join('/');
+                            const { data: removed, error: removeError } = await supabase.storage.from(bucket).remove([path]);
+                            console.debug('removed old review photo', { removed, removeError });
+                        }
+                    }
+                } catch (e) { console.error('error removing old review photo', e); }
+
+                // success - no browser alert
+            } else {
+                const { data: newPost, error } = await supabase
+                    .from('posts')
+                    .insert(reviewData)
+                    .select(`*, profiles (full_name)`)
+                    .single();
+                if (error) throw error;
+                setPosts([newPost, ...posts]);
+                // success - no browser alert
+            }
+            closeModal();
+        } catch (err) {
+            console.error('Error saving review:', err);
+            setFormError('Error saving review: ' + (err.message || 'Unknown error'));
+        } finally {
+            setIsSaving(false);
         }
-        closeModal();
     };
 
     // Delete handlers
@@ -169,11 +219,46 @@ const CommunityReviewsTab = () => {
 
     const confirmDelete = async () => {
         if (postToDelete) {
-            const { error } = await supabase.from('posts').delete().eq('id', postToDelete);
-            if (error) alert("Error deleting post: " + error.message);
-            else setPosts(posts.filter(post => post.id !== postToDelete));
-            setShowDeleteConfirm(false);
-            setPostToDelete(null);
+            try {
+                const { data, error } = await supabase.from('posts').delete().eq('id', postToDelete).select();
+                if (error) {
+                    alert("Error deleting post: " + error.message);
+                } else {
+                    // if the deleted row included a photo_url, remove it from storage
+                    const deleted = Array.isArray(data) ? data[0] : data;
+                    if (deleted && deleted.photo_url) {
+                        const getStorageInfo = (url) => {
+                            try {
+                                const cleaned = url.split('?')[0];
+                                const marker = '/storage/v1/object/public/';
+                                const idx = cleaned.indexOf(marker);
+                                if (idx === -1) return null;
+                                const after = cleaned.substring(idx + marker.length);
+                                const parts = after.split('/');
+                                const bucket = parts.shift();
+                                const path = parts.join('/');
+                                return { bucket, path };
+                            } catch (e) { return null; }
+                        };
+                        const info = getStorageInfo(deleted.photo_url);
+                        if (info) {
+                            try {
+                                const { data: removeData, error: removeErr } = await supabase.storage.from(info.bucket).remove([info.path]);
+                                console.debug('removed storage item', { removeData, removeErr });
+                            } catch (e) {
+                                console.error('error removing storage item', e);
+                            }
+                        }
+                    }
+                    setPosts(posts.filter(post => post.id !== postToDelete));
+                }
+            } catch (e) {
+                console.error('confirmDelete error', e);
+                alert('Error deleting post. See console.');
+            } finally {
+                setShowDeleteConfirm(false);
+                setPostToDelete(null);
+            }
         }
     };
 
@@ -248,38 +333,45 @@ const CommunityReviewsTab = () => {
                 {isModalOpen && (
                     <div className="modal-overlay" onClick={closeModal}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <button onClick={closeModal} className="modal-close-btn">&times;</button>
+                            
                             <h3 className="modal-title">{editingPost ? 'Edit Your Review' : 'Share Your Experience'}</h3>
+                            {formError && <div style={{marginBottom: '0.75rem', color: '#b91c1c', fontSize: '0.95rem'}}>{formError}</div>}
                             <form onSubmit={handleSubmitReview} className="modal-form">
                                 <div className="modal-body space-y-5">
                                     <div>
                                         <label htmlFor="review-title" className="block text-sm font-medium text-slate-600 mb-1">Product Name / Title</label>
                                         <input type="text" id="review-title" value={title} onChange={(e) => setTitle(e.target.value)} className="form-input" required />
+                                        {validationErrors.title && <p className="text-red-600 text-sm mt-1">{validationErrors.title}</p>}
+                                    </div>
+                                    <div className="form-row-grid">
+                                        <div>
+                                            <label htmlFor="review-category" className="block text-sm font-medium text-slate-600 mb-1">Category <span className="required-star">*</span></label>
+                                            <select id="review-category" value={category} onChange={(e) => setCategory(e.target.value)} className="form-input" required>
+                                                <option>Skincare</option>
+                                                <option>Haircare</option>
+                                                <option>Makeup</option>
+                                                <option>Bodycare</option>
+                                                <option>Sunscreen</option>
+                                                <option>Fragrance</option>
+                                            </select>
+                                            {validationErrors.category && <p className="text-red-600 text-sm mt-1">{validationErrors.category}</p>}
+                                        </div>
+                                        <div>
+                                            <label htmlFor="review-rating" className="block text-sm font-medium text-slate-600 mb-1">Your Rating (1-5) <span className="required-star">*</span></label>
+                                            <select id="review-rating" value={rating} onChange={(e) => setRating(Number(e.target.value))} className="form-input" required>
+                                                <option value={5}>5 Stars - Excellent</option>
+                                                <option value={4}>4 Stars - Very Good</option>
+                                                <option value={3}>3 Stars - Good</option>
+                                                <option value={2}>2 Stars - Fair</option>
+                                                <option value={1}>1 Star - Poor</option>
+                                            </select>
+                                            {validationErrors.rating && <p className="text-red-600 text-sm mt-1">{validationErrors.rating}</p>}
+                                        </div>
                                     </div>
                                     <div>
-                                        <label htmlFor="review-category" className="block text-sm font-medium text-slate-600 mb-1">Category</label>
-                                        <select id="review-category" value={category} onChange={(e) => setCategory(e.target.value)} className="form-input" required>
-                                            <option>Skincare</option>
-                                            <option>Haircare</option>
-                                            <option>Makeup</option>
-                                            <option>Bodycare</option>
-                                            <option>Sunscreen</option>
-                                            <option>Fragrance</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="review-rating" className="block text-sm font-medium text-slate-600 mb-1">Your Rating (1-5)</label>
-                                        <select id="review-rating" value={rating} onChange={(e) => setRating(Number(e.target.value))} className="form-input" required>
-                                            <option value={5}>5 Stars - Excellent</option>
-                                            <option value={4}>4 Stars - Very Good</option>
-                                            <option value={3}>3 Stars - Good</option>
-                                            <option value={2}>2 Stars - Fair</option>
-                                            <option value={1}>1 Star - Poor</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="review-details" className="block text-sm font-medium text-slate-600 mb-1">Your Review</label>
-                                        <textarea id="review-details" value={content} onChange={(e) => setContent(e.target.value)} rows="4" className="form-input" required></textarea>
+                                        <label htmlFor="review-details" className="block text-sm font-medium text-slate-600 mb-1">Your Review <span className="required-star">*</span></label>
+                                        <textarea id="review-details" value={content} onChange={(e) => setContent(e.target.value)} rows="6" className="form-input" placeholder="Share what worked for you, how you used it, skin type, sensitivity, and tips" required></textarea>
+                                        {validationErrors.content && <p className="text-red-600 text-sm mt-1">{validationErrors.content}</p>}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-600">Attach an Image</label>
@@ -290,8 +382,8 @@ const CommunityReviewsTab = () => {
                                         <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
                                     </div>
                                 </div>
-                                <div className="submit-btn-container">
-                                    <button type="submit" className="save-btn">{editingPost ? 'SAVE CHANGES' : 'SUBMIT REVIEW'}</button>
+                                <div className="modal-footer">
+                                    <button type="submit" className="save-btn" disabled={isSaving}>{editingPost ? (isSaving ? 'Saving...' : 'Save Changes') : (isSaving ? 'Submitting...' : 'Submit Review')}</button>
                                 </div>
                             </form>
                         </div>

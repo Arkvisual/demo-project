@@ -79,6 +79,9 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      <button className="back-button" onClick={() => navigate('/')}>
+        ← Back to Home
+      </button>
       <Notification />
       <h1 className="brand">Authentiscan</h1>
       <div className="card">

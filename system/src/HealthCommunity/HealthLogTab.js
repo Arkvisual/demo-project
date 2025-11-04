@@ -2,6 +2,21 @@ import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabaseClient";
 
 const styles = `
+/* Shared form input styling (standardized) */
+.form-input {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+.form-input:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+  outline: none;
+}
+
 /* === Scoped Health Log Modal & Timeline Styles === */
 
 /* Overlay */
@@ -22,10 +37,10 @@ const styles = `
   position: relative;
   background-color: white;
   width: 100%;
-  max-width: 32rem;
+  max-width: 48rem;
   border-radius: 1rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  padding: 1.5rem;
+  box-shadow: 0 16px 36px -12px rgba(2,6,23,0.08);
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   max-height: 90vh;
@@ -54,14 +69,11 @@ const styles = `
   border: none;
   border-radius: 9999px;
   cursor: pointer;
-  transition: background-color 0.15s ease-in-out, transform 0.1s;
+  transition: background-color 0.12s ease-in-out;
 }
-.health-log-cancel-btn-top:hover {
-  background-color: #e2e8f0;
-  transform: rotate(90deg);
-}
+.health-log-cancel-btn-top:hover { background-color: #e2e8f0; }
 .health-log-modal-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #1e293b;
   text-align: center;
@@ -79,31 +91,39 @@ const styles = `
 /* Modal Footer */
 .health-log-modal-footer {
   display: flex;
-  justify-content: flex-start !important;
+  justify-content: flex-end;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   padding-top: 1.25rem;
   border-top: 1px solid #f1f5f9;
   margin-top: 1rem;
   flex-shrink: 0;
-  position: relative;
-  bottom: 0;
 }
+.health-log-cancel-btn {
+  background-color: transparent;
+  color: #475569;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease-in-out;
+  cursor: pointer;
+}
+.health-log-cancel-btn:hover { background-color: #f1f5f9; }
 .health-log-save-btn {
   background-color: #f97316;
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.25rem;
   border: none;
   border-radius: 0.5rem;
   font-weight: 600;
-  transition: all 0.15s ease-in-out;
+  transition: background-color 0.12s ease-in-out, transform 0.08s;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.3);
-  position: static;
+  box-shadow: 0 6px 12px rgba(249,115,22,0.12);
   display: inline-block;
 }
 .health-log-save-btn:hover { background-color: #ea580c; }
-.health-log-save-btn:active { transform: scale(0.98); }
+.health-log-save-btn:active { transform: translateY(1px); }
 
 /* Timeline/Grid Layout */
 .timeline-container {
@@ -204,9 +224,9 @@ const styles = `
   background-color: #f8fafc;
   cursor: pointer;
   border: 2px dashed #d1d5db;
-  transition: all 0.2s;
+  transition: border-color 0.15s, background-color 0.12s;
 }
-.file-drop-area:hover { background-color: #f0f4f8; border-color: #f97316; }
+.file-drop-area:hover { background-color: #fff7ed; border-color: #f97316; }
 
 /* Delete Confirmation Dialog */
 .confirm-dialog {
@@ -297,9 +317,41 @@ const HealthLogTab = () => {
 
       const logData = { user_id:user.id, title, content:details, date, photo_url:photoUrl, is_private:true };
       if (editingLog) {
-        const { data, error } = await supabase.from("posts").update(logData).eq("id", editingLog.id).select().single();
-        if (error) alert("Error updating log: "+error.message);
-        else setLogs(prev => prev.map(l => l.id===data.id?data:l));
+        // ensure the updater is the owner (helps with RLS)
+        const { data: updatedData, error } = await supabase
+          .from("posts")
+          .update(logData)
+          .eq("id", editingLog.id)
+          .eq("user_id", user.id)
+          .select();
+
+        console.debug('update log result', { updatedData, error });
+
+          if (error) alert("Error updating log: "+error.message);
+        else if (!updatedData || updatedData.length === 0) {
+          alert('Unable to update the log. It may not belong to you or it was removed.');
+        } else {
+          const returned = Array.isArray(updatedData) ? updatedData[0] : updatedData;
+          setLogs(prev => prev.map(l => l.id===returned.id?returned:l));
+
+          // If a new photo was uploaded, remove the previous photo from storage
+          try {
+            const oldUrl = editingLog?.photo_url;
+            if (oldUrl && photoUrl && oldUrl !== photoUrl) {
+              const cleaned = oldUrl.split('?')[0];
+              const marker = '/storage/v1/object/public/';
+              const idx = cleaned.indexOf(marker);
+              if (idx !== -1) {
+                const after = cleaned.substring(idx + marker.length);
+                const parts = after.split('/');
+                const bucket = parts.shift();
+                const path = parts.join('/');
+                const { data: removed, error: removeError } = await supabase.storage.from(bucket).remove([path]);
+                console.debug('removed old log photo', { removed, removeError });
+              }
+            }
+          } catch (e) { console.error('error removing old log photo', e); }
+        }
       } else {
         const { data, error } = await supabase.from("posts").insert(logData).select().single();
         if (error) alert("Error saving log: "+error.message);
@@ -313,9 +365,44 @@ const HealthLogTab = () => {
   const confirmDelete = async () => {
     if (!logToDelete) return;
     try {
-      const { error } = await supabase.from("posts").delete().eq("id", logToDelete);
-      if (error) console.error(error); else setLogs(prev => prev.filter(l=>l.id!==logToDelete));
-    } catch (err) { console.error(err); }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { alert('You must be logged in to delete a log.'); return; }
+
+      const { data, error } = await supabase
+        .from("posts")
+        .delete()
+        .eq("id", logToDelete)
+        .eq("user_id", user.id)
+        .select();
+
+      console.debug('log delete result', { data, error });
+
+      if (error) {
+        console.error(error);
+        alert('Error deleting log: ' + error.message);
+      } else if (!data || data.length === 0) {
+        alert('Unable to delete the log. It may not belong to you or it was already removed.');
+      } else {
+        // after successful delete, attempt to remove any attached photo from storage
+        const returned = Array.isArray(data) ? data[0] : data;
+        if (returned && returned.photo_url) {
+          try {
+            const cleaned = returned.photo_url.split('?')[0];
+            const marker = '/storage/v1/object/public/';
+            const idx = cleaned.indexOf(marker);
+            if (idx !== -1) {
+              const after = cleaned.substring(idx + marker.length);
+              const parts = after.split('/');
+              const bucket = parts.shift();
+              const path = parts.join('/');
+              const { data: removed, error: removeError } = await supabase.storage.from(bucket).remove([path]);
+              console.debug('removed log photo', { removed, removeError });
+            }
+          } catch (e) { console.error('error removing log photo', e); }
+        }
+        setLogs(prev => prev.filter(l=>l.id!==logToDelete));
+      }
+    } catch (err) { console.error(err); alert('Unexpected error while deleting log. See console.'); }
     finally { setShowDeleteConfirm(false); setLogToDelete(null); }
   };
 
@@ -378,7 +465,7 @@ const HealthLogTab = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-600 mb-1">Details</label>
-                  <textarea value={details} onChange={e=>setDetails(e.target.value)} rows="4" className="form-input" required></textarea>
+                  <textarea value={details} onChange={e=>setDetails(e.target.value)} rows="6" className="form-input" required></textarea>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-600">Attach Photo</label>
@@ -391,6 +478,7 @@ const HealthLogTab = () => {
               </div>
 
               <div className="health-log-modal-footer">
+                <button type="button" onClick={closeModal} className="health-log-cancel-btn">Cancel</button>
                 <button type="submit" className="health-log-save-btn">Save Log</button>
               </div>
             </form>

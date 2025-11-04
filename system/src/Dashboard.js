@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import "./Dashboard.css";
+import { Settings, LogOut, Scan, PackageCheck, HeartPulse, ArrowRight } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,19 +12,14 @@ const Dashboard = () => {
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-
       if (!user) {
         navigate("/login");
       } else {
-        setUser(user); // store user object
+        setUser(user);
         setLoading(false);
       }
     };
-
     checkUser();
-
-    // Initialize Lucide icons
-    if (window.lucide) window.lucide.createIcons();
   }, [navigate]);
 
   const handleLogout = async () => {
@@ -39,22 +35,17 @@ const Dashboard = () => {
     );
   }
 
-  // Extract name from user metadata
   const displayName = user?.user_metadata?.name || user?.user_metadata?.full_name || "User";
+  const email = user?.email || "-";
 
   return (
     <div className="dashboard-container">
-
-      {/* Top Navigation/Header */}
       <nav className="top-nav">
         <h1 className="brand-logo">AuthentiScan</h1>
         <div className="nav-actions">
           <span className="user-greeting">Welcome, {displayName}</span>
-          <button className="nav-button settings-button" title="Settings">
-            <i data-lucide="settings" className="nav-icon"></i>
-          </button>
           <button onClick={handleLogout} className="logout-box-button">
-            <i data-lucide="log-out" className="logout-icon"></i>
+            <LogOut className="logout-icon" />
             Logout
           </button>
         </div>
@@ -76,7 +67,7 @@ const Dashboard = () => {
             {/* Feature 1 */}
             <Link to="/ocr" className="feature-card feature-1 group relative block p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 border-t-4 border-violet-600">
               <div className="icon-badge w-12 h-12 flex items-center justify-center rounded-full bg-violet-100 mb-4">
-                <i data-lucide="scan" className="feature-icon w-6 h-6 text-violet-600"></i>
+                <Scan className="feature-icon w-6 h-6 text-violet-600" />
               </div>
               <h3 className="card-title text-lg font-bold text-gray-800 mb-2">Ingredient Scanner</h3>
               <p className="card-description text-gray-600 mb-3">
@@ -88,14 +79,14 @@ const Dashboard = () => {
                 <li>Get clear insights for safer choices.</li>
               </ul>
               <div className="card-action flex items-center text-violet-600 font-semibold">
-                Scan Now <i data-lucide="arrow-right" className="ml-2 w-4 h-4"></i>
+                Scan Now <ArrowRight className="ml-2 w-4 h-4" />
               </div>
             </Link>
 
             {/* Feature 2 */}
             <Link to="/scan-product" className="feature-card feature-2 group relative block p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 border-t-4 border-teal-500">
               <div className="icon-badge w-12 h-12 flex items-center justify-center rounded-full bg-teal-100 mb-4">
-                <i data-lucide="package-check" className="feature-icon w-6 h-6 text-teal-500"></i>
+                <PackageCheck className="feature-icon w-6 h-6 text-teal-500" />
               </div>
               <h3 className="card-title text-lg font-bold text-gray-800 mb-2">Counterfeit Detector</h3>
               <p className="card-description text-gray-600 mb-3">
@@ -106,14 +97,14 @@ const Dashboard = () => {
                 <li>Check security seals integrity.</li>
               </ul>
               <div className="card-action flex items-center text-teal-500 font-semibold">
-                Verify Product <i data-lucide="arrow-right" className="ml-2 w-4 h-4"></i>
+                Verify Product <ArrowRight className="ml-2 w-4 h-4" />
               </div>
             </Link>
 
             {/* Feature 3 */}
             <Link to="/health-community" className="feature-card feature-3 group relative block p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 border-t-4 border-orange-500">
               <div className="icon-badge w-12 h-12 flex items-center justify-center rounded-full bg-orange-100 mb-4">
-                <i data-lucide="heart-pulse" className="feature-icon w-6 h-6 text-orange-500"></i>
+                <HeartPulse className="feature-icon w-6 h-6 text-orange-500" />
               </div>
               <h3 className="card-title text-lg font-bold text-gray-800 mb-2">Health & Review Log</h3>
               <p className="card-description text-gray-600 mb-3">
@@ -124,7 +115,7 @@ const Dashboard = () => {
                 <li>Contribute to community data.</li>
               </ul>
               <div className="card-action flex items-center text-orange-500 font-semibold">
-                View Log <i data-lucide="arrow-right" className="ml-2 w-4 h-4"></i>
+                View Log <ArrowRight className="ml-2 w-4 h-4" />
               </div>
             </Link>
 
