@@ -1,29 +1,32 @@
 /* ScanProduct.css 
-   Note: The current React component (ProductScanner.jsx) uses Tailwind CSS classes for styling, 
-   so this external file is not currently linked or required for its appearance. 
+   This file IS required for the component to look correct. 
+   It styles the IDs and classes in ScanProduct.js.
 */
 
+/* Main container for the whole page */
 #app-container {
-  max-width: 800px;        /* Increased width */
-  margin: 2rem auto;
-  padding: 3rem;           /* More padding */
+  max-width: 800px;        
+  margin: 2rem auto;      /* Centers the box */
+  padding: 3rem;           
   font-family: 'Inter', sans-serif;
   background-color: #e0f7fa; /* Light cyan background */
-  border-radius: 2rem;     /* Slightly more rounded */
+  border-radius: 2rem;     
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-  min-height: 95vh;        /* Taller box */
+  min-height: 95vh;        
 }
 
+/* Header containing the back button and title */
 .ocr-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* Puts space between button and title */
   margin-bottom: 1.5rem;
 }
 
+/* Back button style */
 .back-btn,
 .about-btn {
-  padding: 0.6rem 1.2rem; /* Larger buttons */
+  padding: 0.6rem 1.2rem; 
   border: none;
   border-radius: 0.75rem;
   font-weight: 600;
@@ -32,13 +35,14 @@
 }
 
 .back-btn {
-  background-color: #6366f1;
+  background-color: #6366f1; /* Indigo color from your other CSS */
 }
 
 .back-btn:hover {
   background-color: #4f46e5;
 }
 
+/* About button (not used, but in your file) */
 .about-btn {
   background-color: #10b981;
 }
@@ -47,39 +51,51 @@
   background-color: #059669;
 }
 
+/* Main title ("Upload Product Image") */
 #main-title {
-  font-size: 2rem;   /* Slightly bigger title */
+  font-size: 2rem;   
   font-weight: 700;
   color: #111827;
   text-align: center;
-  flex: 1;
+  flex: 1; /* Allows title to center itself */
 }
 
+/* Subtitle ("Upload an image...") */
 #main-subtitle {
   text-align: center;
   color: #4b5563;
-  margin-bottom: 2rem;  /* More space below subtitle */
+  margin-bottom: 2rem;  /* CRITICAL: Adds space */
 }
 
 .about-box {
   background-color: #f0fdf4;
   border: 1px solid #34d399;
-  padding: 1.5rem;       /* Taller box */
+  padding: 1.5rem;       
   border-radius: 1rem;
   color: #065f46;
   margin-bottom: 1.5rem;
 }
 
+/* The file upload drop zone */
 .upload-area {
   border: 3px dashed #26a69a;
-  border-radius: 2rem;   /* Slightly more rounded */
-  padding: 3rem;         /* Bigger upload area */
-  text-align: center;
+  border-radius: 2rem;   
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 1.5rem;
   background-color: rgba(38, 166, 154, 0.1);
+  
+  /* ✅ MODIFIED: Set width to 90% and center it */
+  width: 90%; 
+  margin: 0 auto 1.5rem auto; /* Centers the box */
+
+  /* ✅ MODIFIED: Centering text and making box taller */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 3rem; /* 5rem top/bottom, 3rem left/right */
 }
+
 
 .upload-area:hover {
   background-color: #e0f2f1;
@@ -87,7 +103,7 @@
 }
 
 .upload-icon {
-  width: 4rem;  /* Bigger icon */
+  width: 4rem;  
   height: 4rem;
   color: #26a69a;
   margin-bottom: 0.5rem;
@@ -97,7 +113,7 @@
   font-weight: 600;
   color: #374151;
   margin-bottom: 0.25rem;
-  font-size: 1.1rem; /* Slightly bigger text */
+  font-size: 1.1rem; 
 }
 
 #upload-subtext {
@@ -105,31 +121,33 @@
   color: #6b7280;
 }
 
+/* Container for the image preview */
 .preview-container {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem; /* CRITICAL: Adds space */
 }
 
 #image-preview {
   width: 100%;
-  max-height: 350px;  /* Increased height */
+  max-height: 350px;  
   object-fit: contain;
   border-radius: 1rem;
   border: 1px solid #d1d5db;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* The "Analyze" button */
 #verify-button {
   width: 100%;
-  padding: 1rem;         /* Bigger button */
+  padding: 1rem;         
   font-weight: 700;
   color: white;
-  background-color: #6366f1;
+  background-color: #6366f1; /* Indigo color */
   border: none;
   border-radius: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  font-size: 1.1rem;     /* Slightly bigger font */
+  font-size: 1.1rem;     
 }
 
 #verify-button:hover:not(:disabled) {

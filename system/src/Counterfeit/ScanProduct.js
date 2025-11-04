@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// ✅ Make sure this CSS import is at the top!
 import "./ScanProduct.css";
 
 function ScanProduct() {
@@ -9,8 +10,16 @@ function ScanProduct() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ Function to handle the new back button
+  const handleBack = () => {
+    navigate(-1); // Navigates one page back in history
+  };
+
   const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      setSelectedFile(file);
+    }
   };
 
   const handleAnalyze = async () => {
@@ -33,11 +42,7 @@ function ScanProduct() {
         throw new Error("Failed to fetch from backend");
       }
 
-      const data = await response.json(); // data is { confidence: 100, match: 'Genuine' }
-
-      // 🛑 ORIGINAL MISTAKE: navigate("/scan-results", { state: { data } });
-
-      // ✅ FIX: Pass the 'data' object directly as the navigation state
+      const data = await response.json();
       navigate("/scan-results", { state: data });
     } catch (error) {
       console.error("Error uploading or analyzing file:", error);
@@ -48,24 +53,50 @@ function ScanProduct() {
   };
 
   return (
-    <div style={{ textAlign: "center", padding: "3rem", backgroundColor: "#eef3ff", minHeight: "100vh" }}>
-      <h2 style={{ fontSize: "1.8rem", marginBottom: "2rem" }}>Upload Product Image</h2>
+    // ✅ FIX: Using the ID and class structure from your CSS file
+    <div id="app-container">
+      
+      {/* ✅ NEW: Header with Back button and Title, using your CSS classes */}
+      <div className="ocr-header">
+        <button onClick={handleBack} className="back-btn">
+          Back
+        </button>
+        <h1 id="main-title">Upload Product Image</h1>
+      </div>
 
-      <input type="file" onChange={handleFileChange} />
-      <br />
-      <br />
+      <p id="main-subtitle">Upload an image of the product for analysis.</p>
+
+      {/* ✅ FIX: Using "upload-area" class for the label */}
+      <label htmlFor="file-upload" className="upload-area">
+        <input
+          id="file-upload"
+          type="file"
+          onChange={handleFileChange}
+          style={{ display: "none" }} // Input is hidden, label is clickable
+          accept="image/*"
+        />
+        <span id="upload-text">
+          {selectedFile ? selectedFile.name : "Click or drag file to upload"}
+        </span>
+        <span id="upload-subtext">PNG, JPG, GIF up to 10MB</span>
+      </label>
+
+      {/* ✅ FIX: Using "preview-container" for the image */}
+      {selectedFile && (
+        <div className="preview-container">
+          <img
+            id="image-preview"
+            src={URL.createObjectURL(selectedFile)}
+            alt="Product preview"
+          />
+        </div>
+      )}
+
+      {/* ✅ FIX: Using "verify-button" ID for the analyze button */}
       <button
+        id="verify-button"
         onClick={handleAnalyze}
-        disabled={loading}
-        style={{
-          backgroundColor: loading ? "#ccc" : "#3b82f6",
-          color: "white",
-          padding: "0.6rem 1.5rem",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-          fontSize: "1rem",
-        }}
+        disabled={loading || !selectedFile}
       >
         {loading ? "Analyzing..." : "Analyze"}
       </button>
