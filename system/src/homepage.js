@@ -97,7 +97,7 @@ const Homepage = () => {
           <div className="modal-content">
             <button onClick={() => setShowEmailModal(false)}>X</button>
             <h3>Contact Us</h3>
-            <p>📧 authentiscan@gmail.com</p>
+            <p>📧 authentiscan08@gmail.com</p>
           </div>
         </div>
       )}
